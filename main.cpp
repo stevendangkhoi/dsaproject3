@@ -215,6 +215,7 @@ int main(int argc, char** argv) {
     // Time sorting algorithm
     auto startTime = chrono::high_resolution_clock::now();
     if (choice == 1) {
+        mergeSort(workingAds, 0, int(workingAds.size())-1);
     }
     else {
         quickSort(workingAds, 0, (int)workingAds.size() - 1);
