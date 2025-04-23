@@ -1,3 +1,6 @@
+When running this project, a menu appears that allows you to input if you want to use merge sort or quick sort in order to find out each algorithm is the fastest at sorting all Super Bowl ads by views. This menu then gives you the option to filter by content by inputting the corresponding numbers of whatever flags you want to include, with the option to input 0 if you want to include all of them. The output shows how many ads were sorted from highest to lowest as well as how many microseconds it took. A table is printed of the list of ads with their year, brand, views, and content.
+
+
 <H1> COP3530 - Project 3 </h1>
 This is the template for Project 3 repositories. It includes all the assignment instructions and documentation to help you use GitHub.
 
