@@ -6,5 +6,5 @@
 
 using namespace std;
 
-void mergeSort(vector<int> &arr, int left, int right);
+void mergeSort(vector<Ad> &arr, int left, int right);
 #endif //MERGESORT_H

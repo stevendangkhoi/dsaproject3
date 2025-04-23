@@ -138,158 +138,106 @@ int main(int argc, char** argv) {
             ads.push_back(currentAd);
         }
     }
-    // loop
-    bool loop = true;
-    while (loop) {
-        int choice=0;
-        while (true) {
-            // Get user input
-            cout << "Choose sorting algorithm:\n"
-                 << "  1) Merge Sort\n"
-                 << "  2) Quick Sort\n";
-            if (!(cin >> choice) || (choice != 1 && choice != 2)) {
-                cin.clear();
-                cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                cerr << "Error: invalid choice\n";
-            }
-            else {
-                // Clear newline from input
-                cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                break;
-            }
-        }
-        vector<bool> want(8, false);
-        while(true) {
-            cout << "Select content flags to filter (separate numbers by spaces, 0 = no filter):\n"
-                 << "  0) No Filter\n"
-                 << "  1) Funny\n"
-                 << "  2) Product\n"
-                 << "  3) Patriotic\n"
-                 << "  4) Celebrity\n"
-                 << "  5) Danger\n"
-                 << "  6) Animals\n"
-                 << "  7) Sexual\n";
-            vector<bool> contentFlags(8, false);
-            bool noFilter = false;
-            bool valid = true;
-            int flagNum;
-            string inputLine;
-            getline(cin, inputLine);
-            istringstream stream(inputLine);
-            vector<string> inputFlags;
-            string flag;
-            while (stream >> flag) {
-                inputFlags.push_back(flag);
-            }
-            if(inputFlags.empty()) {
-                valid=false;
-            }
-            else {
-                for (auto &t : inputFlags) {
-                    // must be digits
-                    if (!all_of(t.begin(), t.end(), ::isdigit)) {
-                        valid = false;
-                        break;
-                    }
-                    int num = stoi(t);
-                    if (num == 0) {
-                        if (noFilter) {
-                            valid = false;
-                            break;
-                        }
-                        noFilter = true;
-                    }
-                    else if (num >= 1 && num <= 7) {
-                        if (noFilter) {
-                            valid = false;
-                            break;
-                        }
-                        contentFlags[num] = true;
-                    }
-                    else {
-                        valid = false;
-                        break;
-                    }
-                }
-            }
-            if(valid) {
-                want = contentFlags;
-                break;
-            }
-            cerr << "Error: invalid input\n";
-        }
 
-        vector<Ad> workingAds;
-        for (auto& ad : ads) {
-            bool ok = true;
-            if (want[1] && !ad.content.funny) {
-                ok = false;
-            }
-            if (want[2] && !ad.content.product) {
-                ok = false;
-            }
-            if (want[3] && !ad.content.patriotic) {
-                ok = false;
-            }
-            if (want[4] && !ad.content.celebrity) {
-                ok = false;
-            }
-            if (want[5] && !ad.content.danger) {
-                ok = false;
-            }
-            if (want[6] && !ad.content.animals) {
-                ok = false;
-            }
-            if (want[7] && !ad.content.sexual) {
-                ok = false;
-            }
-            if (ok) {
-                workingAds.push_back(ad);
-            }
-        }
+    // Get user input
+    cout << "Choose sorting algorithm:\n"
+         << "  1) Merge Sort\n"
+         << "  2) Quick Sort\n";
+    int choice;
+    if (!(cin >> choice) || (choice != 1 && choice != 2)) {
+        cerr << "Error: invalid choice\n";
+        return 1;
+    }
 
-        // Time sorting algorithm
-        auto startTime = chrono::high_resolution_clock::now();
-        if (choice == 1) {
+    // Clear newline from input
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+    cout << "\nSelect content flags to filter (space‑separated numbers, 0 = no filter):\n"
+         << "  1) Funny\n"
+         << "  2) Product\n"
+         << "  3) Patriotic\n"
+         << "  4) Celebrity\n"
+         << "  5) Danger\n"
+         << "  6) Animals\n"
+         << "  7) Sexual\n";
+    string inputLine;
+    getline(cin, inputLine);
+    istringstream stream(inputLine);
+
+    vector<bool> want(8, false);
+    bool noFilter = false;
+    int flagNum;
+    while (stream >> flagNum) {
+        if (flagNum == 0) {
+            if (noFilter || any_of(want.begin() + 1, want.end(), [](bool v){ return v; })) {
+                cerr << "Error: Cannot combine 0 with other flags\n";
+                return 1;
+            }
+            noFilter = true;
+        }
+        else if (flagNum >= 1 && flagNum <= 7) {
+            want[flagNum] = true;
         }
         else {
-            quickSort(workingAds, 0, (int)workingAds.size() - 1);
+            cerr << "Error: Invalid flag number: " << flagNum << "\n";
         }
-        reverse(workingAds.begin(), workingAds.end());
-        auto endTime = chrono::high_resolution_clock::now();
+    }
 
-        auto elapsed = chrono::duration_cast<chrono::microseconds>(endTime - startTime).count();
-        cout << "Sorted " << workingAds.size()
-             << " ads (highest to lowest views) in " << elapsed << " microseconds.\n\n";
-
-        cout << left
-             << setw(6)  << "Year"
-             << setw(15) << "Brand"
-             << setw(10) << "Views"
-             << "Content\n"
-             << string(60, '-') << "\n";
-
-        for (auto& ad : workingAds) {
-            cout << setw(6)  << ad.year
-                 << setw(15) << ad.brand
-                 << setw(10) << ad.views
-                 << content(ad.content)
-                 << "\n";
+    vector<Ad> workingAds;
+    for (auto& ad : ads) {
+        bool ok = true;
+        if (want[1] && !ad.content.funny) {
+            ok = false;
         }
-        while (true) {
-            cout << "Continue?\n"
-                 << "  0) No\n"
-                 << "  1) Yes\n";
-            string cont;
-            getline(cin, cont);
-            if (!cont.empty() && (cont[0]=='1')) {
-                break;
-            }
-            if (!cont.empty() && (cont[0]=='0')) {
-                loop = false;
-                break;
-            }
-            cerr << "Error: Invalid input\n";
+        if (want[2] && !ad.content.product) {
+            ok = false;
         }
+        if (want[3] && !ad.content.patriotic) {
+            ok = false;
+        }
+        if (want[4] && !ad.content.celebrity) {
+            ok = false;
+        }
+        if (want[5] && !ad.content.danger) {
+            ok = false;
+        }
+        if (want[6] && !ad.content.animals) {
+            ok = false;
+        }
+        if (want[7] && !ad.content.sexual) {
+            ok = false;
+        }
+        if (ok) {
+            workingAds.push_back(ad);
+        }
+    }
+
+    // Time sorting algorithm
+    auto startTime = chrono::high_resolution_clock::now();
+    if (choice == 1) {
+    }
+    else {
+        quickSort(workingAds, 0, (int)workingAds.size() - 1);
+    }
+    reverse(workingAds.begin(), workingAds.end());
+    auto endTime = chrono::high_resolution_clock::now();
+
+    auto elapsed = chrono::duration_cast<chrono::microseconds>(endTime - startTime).count();
+    cout << "\nSorted " << workingAds.size()
+         << " ads (highest to lowest views) in " << elapsed << " microseconds.\n\n";
+
+    cout << left
+         << setw(6)  << "Year"
+         << setw(15) << "Brand"
+         << setw(10) << "Views"
+         << "Content\n"
+         << string(60, '-') << "\n";
+
+    for (auto& ad : workingAds) {
+        cout << setw(6)  << ad.year
+             << setw(15) << ad.brand
+             << setw(10) << ad.views
+             << content(ad.content)
+             << "\n";
     }
 }
