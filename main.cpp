@@ -12,6 +12,7 @@
 #include "QuickSort.h"
 using namespace std;
 
+// string listing which content flags are true
 string content(const ContentFlags& flags) {
     vector<string> parts;
     if (flags.funny) {
@@ -49,6 +50,7 @@ string content(const ContentFlags& flags) {
     return oss.str();
 }
 
+// Remove leading and trailing whitespace from string
 string trim(const string& s) {
     auto left  = s.find_first_not_of(" \t\r\n");
     if (left == string::npos) {
@@ -64,7 +66,7 @@ int main(int argc, char** argv) {
     if (argc > 1) {
         filename = argv[1];
     }
-    ifstream inFile(filename);
+    ifstream inFile(filename); // opens json file
     if (!inFile) {
         cerr << "Error: cannot open \"" << filename << "\"\n";
         cerr << "Usage: " << argv[0]
@@ -75,6 +77,8 @@ int main(int argc, char** argv) {
     vector<Ad> ads;
     Ad currentAd;
     string line;
+
+    // parse line by line
     while (getline(inFile, line)) {
         string t = trim(line);
 
@@ -135,6 +139,7 @@ int main(int argc, char** argv) {
         }
     }
 
+    // Get user input
     cout << "Choose sorting algorithm:\n"
          << "  1) Merge Sort\n"
          << "  2) Quick Sort\n";
@@ -143,6 +148,8 @@ int main(int argc, char** argv) {
         cerr << "Error: invalid choice\n";
         return 1;
     }
+
+    // Clear newline from input
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
     cout << "\nSelect content flags to filter (space‑separated numbers, 0 = no filter):\n"
@@ -205,6 +212,7 @@ int main(int argc, char** argv) {
         }
     }
 
+    // Time sorting algorithm
     auto startTime = chrono::high_resolution_clock::now();
     if (choice == 1) {
     }
